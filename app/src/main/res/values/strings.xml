@@ -1,7 +1,6 @@
 <resources>
-    <string name="app_name">kokoshake_android</string>
-    <string name="title_activity_settings">SettingsActivity</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="app_name">ココshake！</string>
+    <string name="tutorial_text">ココshake!は端末を振ることで、あらかじめインストールされたメールアプリに、位置情報を連携することができるアプリです。\nまずは右上の設定ボタンから初回登録を行ってください。</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

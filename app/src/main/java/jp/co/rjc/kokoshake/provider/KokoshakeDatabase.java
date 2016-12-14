@@ -1,4 +1,4 @@
-package jp.co.rjc.mypassword.provider;
+package jp.co.rjc.kokoshake.provider;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -37,7 +37,7 @@ final public class KokoshakeDatabase extends SQLiteOpenHelper {
     /**
      * 設定情報の列定義
      */
-    public interface LoginColumns {
+    public interface SettingColumns {
 
         /**
          * 送信先アドレスの列名です.
@@ -61,11 +61,13 @@ final public class KokoshakeDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
+        // データベースを新規作成する処理
         createSettingInfo(sqLiteDatabase);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+        // データベースが oldVersion から newVersion(CURRENT_SCHEMA_VERSION) にアップグレードされた場合に呼ばれる
     }
 
     /**
@@ -79,9 +81,9 @@ final public class KokoshakeDatabase extends SQLiteOpenHelper {
                         + Tables.SETTING_INFO
                         + "("
                         + BaseColumns._ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
-                        + LoginColumns.ADDRESS_TO + " TEXT"
-                        + LoginColumns.SUBJECT + " TEXT"
-                        + LoginColumns.LETTER_BODY + " TEXT"
+                        + SettingColumns.ADDRESS_TO + " TEXT"
+                        + SettingColumns.SUBJECT + " TEXT"
+                        + SettingColumns.LETTER_BODY + " TEXT"
                         + ");"
         );
     }

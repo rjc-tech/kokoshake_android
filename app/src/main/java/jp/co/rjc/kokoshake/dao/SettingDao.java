@@ -1,8 +1,10 @@
-package jp.co.rjc.mypassword.dao;
+package jp.co.rjc.kokoshake.dao;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+
+import jp.co.rjc.kokoshake.provider.KokoshakeDatabase;
 
 /**
  * 設定情報のデータアクセスオブジェクトを提供します.
@@ -16,7 +18,7 @@ public final class SettingDao implements KokoshakeDatabase.Tables, KokoshakeData
     }
 
     /**
-     * 設定情報を返却します.
+     * 設定情報を取得します.
      *
      * @return
      */
@@ -35,7 +37,7 @@ public final class SettingDao implements KokoshakeDatabase.Tables, KokoshakeData
      * 設定情報を更新します.
      *
      * @param addressTo
-     * @param subjecty
+     * @param subject
      * @param letterBody
      * @return
      */
@@ -51,9 +53,28 @@ public final class SettingDao implements KokoshakeDatabase.Tables, KokoshakeData
 
         String whereClause = _ID + " = ?";
         String whereArgs[] = new String[1];
-        whereArgs[0] = Integer.toString(“1”);
+        whereArgs[0] = Integer.toString(1);
         try {
             return db.getWritableDatabase().update(SETTING_INFO, values, whereClause, whereArgs);
+        } finally {
+            db.close();
+        }
+    }
+    /**
+     * 設定情報を削除します.
+     *
+     * @param addressTo
+     * @return
+     */
+    public int delete(final String addressTo) {
+        KokoshakeDatabase db = new KokoshakeDatabase(mContext);
+
+        ContentValues values = new ContentValues();
+        values.put(ADDRESS_TO, addressTo);
+
+        String whereClause = _ID + " = ?";
+        try {
+            return db.getWritableDatabase().delete(SETTING_INFO, whereClause, null);
         } finally {
             db.close();
         }

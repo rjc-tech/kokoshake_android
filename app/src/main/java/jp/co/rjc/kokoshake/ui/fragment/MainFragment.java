@@ -30,7 +30,6 @@ public class MainFragment extends Fragment {
 
         mSettingBtn = (ImageView) view.findViewById(R.id.setting_button);
 
-        // パスワード表示切り替えボタンを初期化
         mSettingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

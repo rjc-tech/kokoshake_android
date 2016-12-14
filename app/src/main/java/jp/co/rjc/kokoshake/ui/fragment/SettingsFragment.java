@@ -7,16 +7,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import jp.co.rjc.kokoshake.R;
 
+import static android.R.attr.id;
+
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link SettingsFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link SettingsFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * 設定画面のフラグメント
  */
 public class SettingsFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
@@ -64,8 +62,16 @@ public class SettingsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_settings, container, false);
+        // 画面表示
+        // まだデータないので仮値
+        final View view = inflater.inflate(R.layout.fragment_settings, container);
+        EditText addressTo = (EditText) view.findViewById(R.id.addressTo);
+        addressTo.setText("セットした送信先");
+        EditText subject = (EditText) view.findViewById(R.id.subject);
+        subject.setText("セットした件名");
+        EditText letterBody = (EditText) view.findViewById(R.id.letterBody);
+        letterBody.setText("セットした件名");
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -105,5 +111,53 @@ public class SettingsFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    /**
+     * 設定画面の表示項目の定義。外出しにする？
+     */
+    private class Settings {
+
+        /**
+         * 送信先アドレス
+         */
+        EditText addressTo;
+
+        /**
+         * 件名
+         */
+        EditText subject;
+
+        /**
+         * 本文
+         */
+        EditText letterBody;
+
+        /**
+         * 送信先アドレスを取得
+         */
+        public EditText getAddressTo() {
+            return addressTo;
+        }
+
+        public void setAddressTo(EditText addressTo) {
+            this.addressTo = addressTo;
+        }
+
+        public EditText getSubject() {
+            return subject;
+        }
+
+        public void setSubject(EditText subject) {
+            this.subject = subject;
+        }
+
+        public EditText getLetterBody() {
+            return letterBody;
+        }
+
+        public void setLetterBody(EditText letterBody) {
+            this.letterBody = letterBody;
+        }
     }
 }

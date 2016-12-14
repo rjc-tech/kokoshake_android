@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">kokoshake_android</string>
     <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_main">MainActivity</string>
 </resources>

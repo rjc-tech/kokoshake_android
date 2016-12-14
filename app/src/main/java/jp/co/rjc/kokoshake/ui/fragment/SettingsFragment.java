@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import jp.co.rjc.kokoshake.R;
+import android.widget.Button;
+import android.app.AlertDialog;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -55,9 +57,63 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+
+        // 登録ボタン処理
+        Button button = (Button)getActivity().findViewById(R.id.button2);
+        // ボタンがクリックされた時に呼び出されるコールバックリスナーを登録します
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // クリック時の処理
+                // ボタン登録メイン処理を呼ぶ
+                setMain(v);
+            }
+        });
+    }
+
+    // 登録ボタンメイン処理
+    private void setMain(View v) {
+        // 処理
+        // 未入力チェックを呼ぶ
+        in‎putCheck(v);
+
+        // 登録処理を呼ぶ
+    }
+
+    // 入力チェック処理
+    private void in‎putCheck(View v) {
+        // 処理
+        //　未入力チェック
+
+        // 必須チェック有無
+        boolean required = false;
+
+        // 必須チェックエラー時のエラーメッセージ
+        String required_message = "が未入力です";
+
+        // エラー時にメッセージ表示
+
+        //  メーラー
+        //  送信先アドレス
+        //　件名
+        //  本文
+
+        // エラー時にメッセージ表示
+        if (required == false) {
+//            if (getText().length() == 0) {
+//                // 何も入力されていないのでエラーを表示する
+//                Toast.makeText(context, required_message, Toast.LENGTH_LONG).show();
+//            }
+            new AlertDialog.Builder(getActivity())
+                    .setTitle("エラー")
+                    .setMessage(required_message)
+                    .setPositiveButton("OK", null)
+                    .show();
         }
     }
 

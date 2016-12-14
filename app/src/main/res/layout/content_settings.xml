@@ -13,4 +13,5 @@
     tools:context="jp.co.rjc.kokoshake.ui.activity.SettingsActivity"
     tools:showIn="@layout/activity_settings">
 
+
 </RelativeLayout>

@@ -10,24 +10,10 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="jp.co.rjc.kokoshake.ui.activity.MainActivity">
 
-    <ImageView
-        android:id="@+id/setting_button"
-        android:src="@drawable/btn_setting"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true" />
-
-    <ImageView
-        android:src="@drawable/shake_me"
-        android:scaleType="center"
+    <fragment
+        android:id="@+id/site_detail_fragment"
+        android:name="jp.co.rjc.kokoshake.ui.fragment.MainFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <TextView
-        android:id="@+id/tutorial_text"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:text="@string/tutorial_text"
-        android:layout_alignParentBottom="true" />
+        android:layout_height="match_parent"/>
 
 </RelativeLayout>

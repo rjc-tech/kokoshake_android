@@ -11,9 +11,9 @@ import jp.co.rjc.kokoshake.R;
 /**
  * 初期画面用フラグメント.
  */
-public class InitFragment extends Fragment {
+public class ShakeFragment extends Fragment {
 
-    public InitFragment() {
+    public ShakeFragment() {
     }
 
     @Override
@@ -24,7 +24,7 @@ public class InitFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_init, container, false);
+        View view = inflater.inflate(R.layout.fragment_shake, container, false);
 
         return view;
     }

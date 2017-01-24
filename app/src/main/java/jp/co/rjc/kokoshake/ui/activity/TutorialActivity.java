@@ -11,12 +11,12 @@ import jp.co.rjc.kokoshake.R;
 /**
  * 初回起動チュートリアル用フラグメント.
  */
-public class MainActivity extends AppCompatActivity {
+public class TutorialActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_tutorial);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
             // 「設定」アイコンがクリックされた場合
             case R.id.menu_setting_id:
                 // 設定画面へ遷移
-                intent = new Intent(MainActivity.this, SettingsActivity.class);
+                intent = new Intent(TutorialActivity.this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
             // 「about」アイコンがクリックされた場合

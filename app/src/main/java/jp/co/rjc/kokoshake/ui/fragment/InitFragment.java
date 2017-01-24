@@ -9,11 +9,11 @@ import android.view.ViewGroup;
 import jp.co.rjc.kokoshake.R;
 
 /**
- * 初回起動チュートリアル用フラグメント.
+ * 初期画面用フラグメント.
  */
-public class MainFragment extends Fragment {
+public class InitFragment extends Fragment {
 
-    public MainFragment() {
+    public InitFragment() {
     }
 
     @Override
@@ -24,7 +24,7 @@ public class MainFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_main, container, false);
+        View view = inflater.inflate(R.layout.fragment_init, container, false);
 
         return view;
     }

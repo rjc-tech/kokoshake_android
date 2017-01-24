@@ -9,6 +9,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+<<<<<<< HEAD
             android:name=".ui.activity.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:theme="@style/AppTheme.NoActionBar" >
@@ -19,6 +20,15 @@
             </intent-filter>
         </activity>
 
+=======
+            android:name="jp.co.rjc.kokoshake.ui.activity.MainActivity"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+>>>>>>> feature/10985_initActivity
     </application>
 
 </manifest>

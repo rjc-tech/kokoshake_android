@@ -11,7 +11,5 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="jp.co.rjc.kokoshake.ui.activity.SettingsActivity"
-    tools:showIn="@layout/activity_settings">
-
-
+    tools:showIn="@layout/activity_settings">s
 </RelativeLayout>

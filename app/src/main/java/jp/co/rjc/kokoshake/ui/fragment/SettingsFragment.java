@@ -23,7 +23,7 @@ public class SettingsFragment extends Fragment {
 
     static final int OPEN_CONTACT_REQUEST = 1;
 
-    static TextView sSendAddress;
+    protected static TextView sSendAddress;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,11 +35,20 @@ public class SettingsFragment extends Fragment {
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
+        // 送信先アドレス
         sSendAddress = (TextView) view.findViewById(R.id.send_address);
         sSendAddress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openContact();
+            }
+        });
+
+        // キャンセルボタン
+        view.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().finish();
             }
         });
         return view;

@@ -10,12 +10,15 @@ import android.provider.ContactsContract;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import jp.co.rjc.kokoshake.R;
+import jp.co.rjc.kokoshake.util.SharedPreferenceUtil;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -24,6 +27,8 @@ public class SettingsFragment extends Fragment {
     static final int OPEN_CONTACT_REQUEST = 1;
 
     protected static TextView sSendAddress;
+    protected TextView mInputSubject;
+    protected TextView mInputContent;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -37,10 +42,45 @@ public class SettingsFragment extends Fragment {
 
         // 送信先アドレス
         sSendAddress = (TextView) view.findViewById(R.id.send_address);
+        sSendAddress.setText(SharedPreferenceUtil.getSendAddress(getContext()));
         sSendAddress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openContact();
+            }
+        });
+
+        // 件名
+        mInputSubject = (TextView) view.findViewById(R.id.input_subject);
+        mInputSubject.setText(SharedPreferenceUtil.getMailSubject(getContext()));
+
+        // 本文
+        mInputContent = (TextView) view.findViewById(R.id.input_content);
+        mInputContent.setText(SharedPreferenceUtil.getMailContent(getContext()));
+
+        // 登録ボタン
+        view.findViewById(R.id.registration).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (TextUtils.isEmpty(sSendAddress.getText())) {
+                    final AlertDialog.Builder alertDlg = new AlertDialog.Builder(getContext());
+                    alertDlg.setMessage(String.format(getActivity().getResources().getString(R.string.message_err_required), getActivity().getResources().getString(R.string.send_address)));
+                    alertDlg.setPositiveButton(
+                            "OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // ignore
+                                }
+                            });
+                    alertDlg.create().show();
+                    return;
+                }
+
+                SharedPreferenceUtil.saveSendAddress(getContext(), sSendAddress.getText().toString());
+                SharedPreferenceUtil.saveMailSubject(getContext(), mInputSubject.getText().toString());
+                SharedPreferenceUtil.saveMailContent(getContext(), mInputContent.getText().toString());
+                Toast.makeText(getContext(), R.string.message_registration_complete, Toast.LENGTH_LONG).show();
             }
         });
 

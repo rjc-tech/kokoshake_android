@@ -9,18 +9,18 @@ import android.view.MenuItem;
 import jp.co.rjc.kokoshake.R;
 
 /**
- * 初期画面用フラグメント.
+ * kokoシェイク 初期画面用フラグメント.
  */
-public class InitActivity extends AppCompatActivity {
+public class ShakeActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_init);
+        setContentView(R.layout.activity_shake);
 
 
 //        // Fragmentを作成します
-//        MainFragment fragment = new MainFragment();
+//        TutorialFragment fragment = new TutorialFragment();
 //        // Fragmentの追加や削除といった変更を行う際は、Transactionを利用します
 //        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 //        // 新しく追加を行うのでaddを使用します
@@ -54,13 +54,13 @@ public class InitActivity extends AppCompatActivity {
             // 「設定」アイコンがクリックされた場合
             case R.id.menu_setting_id:
                 // 設定画面へ遷移
-                intent = new Intent(InitActivity.this, SettingsActivity.class);
+                intent = new Intent(ShakeActivity.this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
             // 「about」アイコンがクリックされた場合
             case R.id.menu_about_id:
                 // チュートリアル画面へ遷移
-                intent = new Intent(InitActivity.this, MainActivity.class);
+                intent = new Intent(ShakeActivity.this, TutorialActivity.class);
                 startActivity(intent);
                 return true;
             default:

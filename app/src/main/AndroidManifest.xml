@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="jp.co.rjc.kokoshake.ui.activity.InitActivity"
+            android:name="jp.co.rjc.kokoshake.ui.activity.ShakeActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -22,7 +22,10 @@
             android:name=".ui.activity.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:theme="@style/AppTheme.NoActionBar" />
-
+        <activity
+            android:name=".ui.activity.TutorialActivity"
+            android:launchMode="singleTop">
+        </activity>
     </application>
 
 </manifest>

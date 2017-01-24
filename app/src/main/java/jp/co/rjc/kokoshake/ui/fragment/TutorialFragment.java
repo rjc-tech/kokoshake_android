@@ -11,9 +11,9 @@ import jp.co.rjc.kokoshake.R;
 /**
  * 初回起動チュートリアル用フラグメント.
  */
-public class MainFragment extends Fragment {
+public class TutorialFragment extends Fragment {
 
-    public MainFragment() {
+    public TutorialFragment() {
     }
 
     @Override
@@ -24,7 +24,7 @@ public class MainFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_main, container, false);
+        View view = inflater.inflate(R.layout.fragment_tutorial, container, false);
 
         return view;
     }

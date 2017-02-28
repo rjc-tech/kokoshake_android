@@ -199,10 +199,10 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
             mVibrator.vibrate(500);
 
             Intent intent = new Intent();
-            intent.setAction(Intent.ACTION_SEND);
+            intent.setAction(Intent.ACTION_SENDTO);
 
             intent.setType("text/plain");
-            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{sendAddress});
+            intent.setData(Uri.parse("mailto:".concat(sendAddress)));
 
             // 件名
             final String subject = SharedPreferenceUtil.getMailSubject(getApplicationContext());

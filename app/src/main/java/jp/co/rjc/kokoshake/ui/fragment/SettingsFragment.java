@@ -1,109 +1,230 @@
 package jp.co.rjc.kokoshake.ui.fragment;
 
-import android.content.Context;
-import android.net.Uri;
+import android.app.Dialog;
+import android.content.ContentResolver;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import jp.co.rjc.kokoshake.R;
+import jp.co.rjc.kokoshake.util.SharedPreferenceUtil;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link SettingsFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link SettingsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import static android.app.Activity.RESULT_OK;
+
 public class SettingsFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    static final int OPEN_CONTACT_REQUEST = 1;
 
-    private OnFragmentInteractionListener mListener;
-
-    public SettingsFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SettingsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SettingsFragment newInstance(String param1, String param2) {
-        SettingsFragment fragment = new SettingsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    protected static TextView sSendAddress;
+    protected TextView mInputSubject;
+    protected TextView mInputContent;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_settings, container, false);
-    }
+        final View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
+        // 送信先アドレス
+        sSendAddress = (TextView) view.findViewById(R.id.send_address);
+        sSendAddress.setText(SharedPreferenceUtil.getSendAddress(getContext()));
+        sSendAddress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openContact();
+            }
+        });
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
+        // 件名
+        mInputSubject = (TextView) view.findViewById(R.id.input_subject);
+        mInputSubject.setText(SharedPreferenceUtil.getMailSubject(getContext()));
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
+        // 本文
+        mInputContent = (TextView) view.findViewById(R.id.input_content);
+        mInputContent.setText(SharedPreferenceUtil.getMailContent(getContext()));
+
+        // 登録ボタン
+        view.findViewById(R.id.registration).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (TextUtils.isEmpty(sSendAddress.getText())) {
+                    final AlertDialog.Builder alertDlg = new AlertDialog.Builder(getContext());
+                    alertDlg.setMessage(String.format(getActivity().getResources().getString(R.string.message_err_required), getActivity().getResources().getString(R.string.send_address)));
+                    alertDlg.setPositiveButton(
+                            "OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // ignore
+                                }
+                            });
+                    alertDlg.create().show();
+                    return;
+                }
+
+                SharedPreferenceUtil.saveSendAddress(getContext(), sSendAddress.getText().toString());
+                SharedPreferenceUtil.saveMailSubject(getContext(), mInputSubject.getText().toString());
+                SharedPreferenceUtil.saveMailContent(getContext(), mInputContent.getText().toString());
+                Toast.makeText(getContext(), R.string.message_registration_complete, Toast.LENGTH_LONG).show();
+            }
+        });
+
+        // キャンセルボタン
+        view.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().finish();
+            }
+        });
+        return view;
     }
 
     /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
+     * 電話帳アプリを開きます.
      */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+    private void openContact() {
+        Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+        intent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
+        startActivityForResult(intent, OPEN_CONTACT_REQUEST);
+    }
+
+    @Override
+    public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+
+        switch (requestCode) {
+            case OPEN_CONTACT_REQUEST:
+                if (resultCode == RESULT_OK) {
+                    onMailAddressAddressBookResult(data);
+                } else {
+                    final AlertDialog.Builder alertDlg = new AlertDialog.Builder(getContext());
+                    alertDlg.setMessage(R.string.message_err_open_contact);
+                    alertDlg.setPositiveButton(
+                            "OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // ignore
+                                }
+                            });
+                    alertDlg.create().show();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * アドレス帳（メールアドレス）の表示.
+     */
+    private void onMailAddressAddressBookResult(Intent data) {
+        String[] mailAddresses = new String[0];
+        ContentResolver contentResolver = getActivity().getContentResolver();
+        Cursor c = contentResolver.query(data.getData(), null, null, null, null);
+        String id = "";
+        if (c.moveToFirst()) {
+            id = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Email.CONTACT_ID));
+
+            // 選択された人のメールアドレスをすべて取得
+            Cursor mailC = contentResolver.query(
+                    ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+                    null,
+                    ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = " + id,
+                    null,
+                    null);
+            if (mailC.moveToFirst()) {
+                mailAddresses = new String[mailC.getCount()];
+                int count = 0;
+                do {
+                    mailAddresses[count] = mailC.getString(
+                            mailC.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
+                    count++;
+                } while (mailC.moveToNext());
+            }
+            mailC.close();
+        }
+        c.close();
+
+        // メールアドレスを持っていない連絡先を選択した場合はエラー
+        if (mailAddresses.length <= 0) {
+            final AlertDialog.Builder alertDlg = new AlertDialog.Builder(getContext());
+            alertDlg.setMessage(R.string.message_err_no_mail_address);
+            alertDlg.setPositiveButton(
+                    "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // ignore
+                        }
+                    });
+            alertDlg.create().show();
+            return;
+        }
+
+        // メールアドレスが１つの場合そのまま設定
+        if (mailAddresses.length == 1) {
+            sSendAddress.setText(mailAddresses[0]);
+            return;
+        }
+
+        // メールアドレスが複数ある場合、シングル選択ダイアログフラグメントを表示
+        SingleSelectDialogFragment fragment = SingleSelectDialogFragment.newInstance(
+                R.string.select_address, mailAddresses, 1);
+        fragment.show(getFragmentManager(), null);
+    }
+
+    /**
+     * シングルセレクトダイアログフラグメント.
+     */
+    public static class SingleSelectDialogFragment extends DialogFragment {
+
+        private static final String TITLE = "title";
+        private static final String ITEMS = "items";
+
+        private String selectedItem = "";
+
+        public static SingleSelectDialogFragment newInstance(int title, String[] items, int selectKind) {
+            SingleSelectDialogFragment fragment = new SingleSelectDialogFragment();
+            Bundle args = new Bundle();
+            args.putInt(TITLE, title);
+            args.putStringArray(ITEMS, items);
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle safedInstanceState) {
+            int title = getArguments().getInt(TITLE);
+            final String[] items = getArguments().getStringArray(ITEMS);
+            selectedItem = items[0];
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(title);
+            builder.setSingleChoiceItems(items, 0, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int item) {
+                    selectedItem = items[item];
+                }
+            })
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            sSendAddress.setText(selectedItem);
+                        }
+                    })
+                    .setNegativeButton("Cancel", null);
+            return builder.create();
+        }
     }
 }

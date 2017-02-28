@@ -21,6 +21,7 @@ import android.widget.Toast;
 import jp.co.rjc.kokoshake.R;
 import jp.co.rjc.kokoshake.util.SharedPreferenceUtil;
 
+import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
 public class SettingsFragment extends Fragment {
@@ -112,7 +113,7 @@ public class SettingsFragment extends Fragment {
             case OPEN_CONTACT_REQUEST:
                 if (resultCode == RESULT_OK) {
                     onMailAddressAddressBookResult(data);
-                } else {
+                } else if (resultCode != RESULT_CANCELED) {
                     final AlertDialog.Builder alertDlg = new AlertDialog.Builder(getContext());
                     alertDlg.setMessage(R.string.message_err_open_contact);
                     alertDlg.setPositiveButton(

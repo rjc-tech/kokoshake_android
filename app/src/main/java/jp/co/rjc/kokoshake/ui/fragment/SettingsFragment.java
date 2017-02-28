@@ -102,7 +102,7 @@ public class SettingsFragment extends Fragment {
      */
     private void openContact() {
         Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-        intent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
+        intent.setType(ContactsContract.CommonDataKinds.Email.CONTENT_TYPE);
         startActivityForResult(intent, OPEN_CONTACT_REQUEST);
     }
 

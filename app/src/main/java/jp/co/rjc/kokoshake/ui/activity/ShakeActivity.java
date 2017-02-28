@@ -5,7 +5,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
@@ -88,7 +87,7 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
             // 「about」アイコンがクリックされた場合
             case R.id.menu_about_id:
                 // チュートリアル画面へ遷移
-                intent = new Intent(ShakeActivity.this, TutorialActivity.class);
+                intent = new Intent(ShakeActivity.this, AboutActivity.class);
                 startActivity(intent);
                 return true;
             default:

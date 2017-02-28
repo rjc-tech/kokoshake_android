@@ -58,6 +58,8 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
     private LocationManager locationManager; // GPS取得用オブジェクト
     private static final int minTime = 1000;// GPS取得用
     private static final float minDistance = 50;// GPS取得用
+    private double latitude = 0;// 緯度
+    private double longitude = 0;// 経度
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -233,11 +235,12 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
         }
         startGPS();
         // 位置の取得
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        locationManager.removeUpdates(this);
 
         // location.get
         String mapLink = "https://www.google.co.jp/maps/@";
-        mapLink = mapLink + String.valueOf(location.getLatitude()) + "," + String.valueOf(location.getLongitude());
+        mapLink = mapLink + String.valueOf(latitude) + "," + String.valueOf(longitude);
 
         final String sendAddress = SharedPreferenceUtil.getSendAddress(getApplicationContext());
         if (!TextUtils.isEmpty(sendAddress)) {
@@ -279,7 +282,6 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
                     return;
                 }
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, minDistance, this);
-                locationManager.removeUpdates(this);
             } catch (Exception e) {
                 e.printStackTrace();
 
@@ -296,7 +298,8 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
 
     @Override
     public void onLocationChanged(Location location) {
-
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
     }
 
     @Override

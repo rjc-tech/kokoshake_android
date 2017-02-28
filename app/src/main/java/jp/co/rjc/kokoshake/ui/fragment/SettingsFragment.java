@@ -189,6 +189,8 @@ public class SettingsFragment extends Fragment {
         fragment.show(getFragmentManager(), null);
     }
 
+
+
     /**
      * シングルセレクトダイアログフラグメント.
      */

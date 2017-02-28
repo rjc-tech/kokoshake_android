@@ -1,28 +1,45 @@
 package jp.co.rjc.kokoshake.ui.activity;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import java.util.List;
 
 import jp.co.rjc.kokoshake.R;
+import jp.co.rjc.kokoshake.ui.fragment.SettingsFragment;
 import jp.co.rjc.kokoshake.util.SharedPreferenceUtil;
+
+import static android.support.v7.appcompat.R.id.text;
 
 /**
  * kokoシェイク 初期画面用フラグメント.
  */
-public class ShakeActivity extends AppCompatActivity implements SensorEventListener {
+public class ShakeActivity extends AppCompatActivity implements SensorEventListener, LocationListener {
 
     private static final int SPEED_THRESHOLD = 3000;  //1カウントに必要な端末の最低速度
     private static final int SHAKE_TIMEOUT = 1000;    //端末が最低速度で振られるまでの時間
@@ -38,6 +55,9 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
     private SensorManager mManager;  //センサーマネージャーオブジェクト
     private RelativeLayout relativeLayout;  //リレーティブレイアウトオブジェクト
     private Vibrator mVibrator;  //バイブレーションオブジェクト
+    private LocationManager locationManager; // GPS取得用オブジェクト
+    private static final int minTime = 1000;// GPS取得用
+    private static final float minDistance = 50;// GPS取得用
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -192,6 +212,33 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
     }
 
     private void callMailer() {
+        // GPS情報の取得
+        // 権限
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (locationManager != null) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            }
+        }
+        // GPS測位
+        final boolean gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if (!gpsEnabled) {
+            Toast toast = Toast.makeText(this, "GPSをオンにしてください。", Toast.LENGTH_SHORT);
+            toast.show();
+            // GPSを設定する画面に遷移する
+            Intent settingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivity(settingsIntent);
+            return;
+        }
+        startGPS();
+        // 位置の取得
+        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+        // location.get
+        String mapLink = "https://www.google.co.jp/maps/@";
+        mapLink = mapLink + String.valueOf(location.getLatitude()) + "," + String.valueOf(location.getLongitude());
+
         final String sendAddress = SharedPreferenceUtil.getSendAddress(getApplicationContext());
         if (!TextUtils.isEmpty(sendAddress)) {
 
@@ -215,12 +262,55 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
             // 本文
             final String content = SharedPreferenceUtil.getMailContent(getApplicationContext());
             if (TextUtils.isEmpty(content)) {
-                intent.putExtra(Intent.EXTRA_TEXT, "仮の本文です。");
+                intent.putExtra(Intent.EXTRA_TEXT, "仮の本文です。" + mapLink);
             } else {
-                intent.putExtra(Intent.EXTRA_TEXT, content);
+                intent.putExtra(Intent.EXTRA_TEXT, content + mapLink);
             }
             startActivity(Intent.createChooser(intent, null));
         }
+    }
+
+    protected void startGPS() {
+        if (locationManager != null) {
+            Log.d("LocationActivity", "locationManager.requestLocationUpdates");
+            // バックグラウンドから戻ってしまうと例外が発生する場合がある
+            try {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, minDistance, this);
+                locationManager.removeUpdates(this);
+            } catch (Exception e) {
+                e.printStackTrace();
+
+                Toast toast = Toast.makeText(this, "例外が発生、位置情報のPermissionを許可していますか？", Toast.LENGTH_SHORT);
+                toast.show();
+
+                //MainActivityに戻す
+                finish();
+            }
+        } else {
+        }
+        super.onResume();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
 
     }
 }

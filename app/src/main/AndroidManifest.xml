@@ -25,13 +25,16 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.activity.TutorialActivity"
+            android:name=".ui.activity.AboutActivity"
+            android:label="@string/about_application"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait"></activity><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.LicensesActivity"
+            android:label="@string/label_licenses"
+            android:launchMode="singleTask"></activity>
+        <!-- ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
     </application>
 
 </manifest>

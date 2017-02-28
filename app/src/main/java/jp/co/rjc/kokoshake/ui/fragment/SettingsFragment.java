@@ -14,12 +14,14 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import jp.co.rjc.kokoshake.R;
 import jp.co.rjc.kokoshake.util.SharedPreferenceUtil;
 
+import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
 public class SettingsFragment extends Fragment {
@@ -27,8 +29,8 @@ public class SettingsFragment extends Fragment {
     static final int OPEN_CONTACT_REQUEST = 1;
 
     protected static TextView sSendAddress;
-    protected TextView mInputSubject;
-    protected TextView mInputContent;
+    protected EditText mInputSubject;
+    protected EditText mInputContent;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,11 +53,11 @@ public class SettingsFragment extends Fragment {
         });
 
         // 件名
-        mInputSubject = (TextView) view.findViewById(R.id.input_subject);
+        mInputSubject = (EditText) view.findViewById(R.id.input_subject);
         mInputSubject.setText(SharedPreferenceUtil.getMailSubject(getContext()));
 
         // 本文
-        mInputContent = (TextView) view.findViewById(R.id.input_content);
+        mInputContent = (EditText) view.findViewById(R.id.input_content);
         mInputContent.setText(SharedPreferenceUtil.getMailContent(getContext()));
 
         // 登録ボタン
@@ -81,6 +83,7 @@ public class SettingsFragment extends Fragment {
                 SharedPreferenceUtil.saveMailSubject(getContext(), mInputSubject.getText().toString());
                 SharedPreferenceUtil.saveMailContent(getContext(), mInputContent.getText().toString());
                 Toast.makeText(getContext(), R.string.message_registration_complete, Toast.LENGTH_LONG).show();
+                getActivity().finish();
             }
         });
 
@@ -110,7 +113,7 @@ public class SettingsFragment extends Fragment {
             case OPEN_CONTACT_REQUEST:
                 if (resultCode == RESULT_OK) {
                     onMailAddressAddressBookResult(data);
-                } else {
+                } else if (resultCode != RESULT_CANCELED) {
                     final AlertDialog.Builder alertDlg = new AlertDialog.Builder(getContext());
                     alertDlg.setMessage(R.string.message_err_open_contact);
                     alertDlg.setPositiveButton(

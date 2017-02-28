@@ -27,7 +27,7 @@
         android:layout_margin="10dp"
         android:text="@string/mail_subject" />
 
-    <TextView
+    <EditText
         android:id="@+id/input_subject"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
         android:layout_margin="10dp"
         android:text="@string/mail_content" />
 
-    <TextView
+    <EditText
         android:id="@+id/input_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

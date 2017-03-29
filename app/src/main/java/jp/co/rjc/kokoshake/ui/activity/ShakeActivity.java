@@ -1,17 +1,16 @@
 package jp.co.rjc.kokoshake.ui.activity;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -23,18 +22,15 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.util.List;
 
 import jp.co.rjc.kokoshake.R;
-import jp.co.rjc.kokoshake.ui.fragment.SettingsFragment;
 import jp.co.rjc.kokoshake.util.SharedPreferenceUtil;
 
-import static android.support.v7.appcompat.R.id.text;
+import static android.support.v7.appcompat.R.id.time;
 
 /**
  * kokoシェイク 初期画面用フラグメント.
@@ -55,11 +51,12 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
     private SensorManager mManager;  //センサーマネージャーオブジェクト
     private RelativeLayout relativeLayout;  //リレーティブレイアウトオブジェクト
     private Vibrator mVibrator;  //バイブレーションオブジェクト
-    private LocationManager locationManager; // GPS取得用オブジェクト
-    private static final int minTime = 1000;// GPS取得用
-    private static final float minDistance = 50;// GPS取得用
-    private double latitude = 0;// 緯度
-    private double longitude = 0;// 経度
+    private LocationManager mLocationManager; // GPS取得用オブジェクト
+    private static final int mMinTime = 1000;// GPS取得用
+    private static final float mMinDistance = 50;// GPS取得用
+    private double mLatitude = 0;// 緯度
+    private double mLongitude = 0;// 経度
+    private String mProvider;// プロバイダ
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -216,90 +213,133 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
     private void callMailer() {
         // GPS情報の取得
         // 権限
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        if (locationManager != null) {
+        mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (mLocationManager != null) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                     || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
+                Criteria criteria = new Criteria();
+                criteria.setAccuracy(Criteria. ACCURACY_FINE);
+
+                // 現在地取得
+                mProvider = mLocationManager.getBestProvider(criteria, true);
+
+                final boolean gpsEnabled = mLocationManager.isProviderEnabled(mProvider);
+                if (!gpsEnabled) {
+                    Toast toast = Toast.makeText(this, "GPSをオンにしてください。", Toast.LENGTH_SHORT);
+                    toast.show();
+                    // GPSを設定する画面に遷移する
+                    Intent settingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(settingsIntent);
+                    return;
+                }
+                startGPS();
+
+                String mapLink = "https://www.google.co.jp/maps/@";
+                mapLink = mapLink + String.valueOf(mLatitude) + "," + String.valueOf(mLongitude);
+
+                mLocationManager.removeUpdates(this);
+
+                final String sendAddress = SharedPreferenceUtil.getSendAddress(getApplicationContext());
+                if (!TextUtils.isEmpty(sendAddress)) {
+
+                    mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+                    mVibrator.vibrate(500);
+
+                    Intent intent = new Intent();
+                    intent.setAction(Intent.ACTION_SENDTO);
+
+                    intent.setType("text/plain");
+                    intent.setData(Uri.parse("mailto:".concat(sendAddress)));
+
+                    // 件名
+                    final String subject = SharedPreferenceUtil.getMailSubject(getApplicationContext());
+                    if (TextUtils.isEmpty(subject)) {
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "仮のタイトル");
+                    } else {
+                        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+                    }
+
+                    // 本文
+                    final String content = SharedPreferenceUtil.getMailContent(getApplicationContext());
+                    if (TextUtils.isEmpty(content)) {
+                        intent.putExtra(Intent.EXTRA_TEXT, "仮の本文です。" + mapLink);
+                    } else {
+                        intent.putExtra(Intent.EXTRA_TEXT, content + mapLink);
+                    }
+                    startActivity(Intent.createChooser(intent, null));
+                }
+            } else {
+                Toast toast = Toast.makeText(this, "位置情報を取得できませんでした。", Toast.LENGTH_SHORT);
+                toast.show();
+                return;
             }
-        }
-        // GPS測位
-        final boolean gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        if (!gpsEnabled) {
-            Toast toast = Toast.makeText(this, "GPSをオンにしてください。", Toast.LENGTH_SHORT);
+        } else {
+            Toast toast = Toast.makeText(this, "位置情報を取得できませんでした。", Toast.LENGTH_SHORT);
             toast.show();
-            // GPSを設定する画面に遷移する
-            Intent settingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            startActivity(settingsIntent);
             return;
-        }
-        startGPS();
-        // 位置の取得
-        locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        locationManager.removeUpdates(this);
-
-        // location.get
-        String mapLink = "https://www.google.co.jp/maps/@";
-        mapLink = mapLink + String.valueOf(latitude) + "," + String.valueOf(longitude);
-
-        final String sendAddress = SharedPreferenceUtil.getSendAddress(getApplicationContext());
-        if (!TextUtils.isEmpty(sendAddress)) {
-
-            mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-            mVibrator.vibrate(500);
-
-            Intent intent = new Intent();
-            intent.setAction(Intent.ACTION_SENDTO);
-
-            intent.setType("text/plain");
-            intent.setData(Uri.parse("mailto:".concat(sendAddress)));
-
-            // 件名
-            final String subject = SharedPreferenceUtil.getMailSubject(getApplicationContext());
-            if (TextUtils.isEmpty(subject)) {
-                intent.putExtra(Intent.EXTRA_SUBJECT, "仮のタイトル");
-            } else {
-                intent.putExtra(Intent.EXTRA_SUBJECT, subject);
-            }
-
-            // 本文
-            final String content = SharedPreferenceUtil.getMailContent(getApplicationContext());
-            if (TextUtils.isEmpty(content)) {
-                intent.putExtra(Intent.EXTRA_TEXT, "仮の本文です。" + mapLink);
-            } else {
-                intent.putExtra(Intent.EXTRA_TEXT, content + mapLink);
-            }
-            startActivity(Intent.createChooser(intent, null));
         }
     }
 
     protected void startGPS() {
-        if (locationManager != null) {
-            Log.d("LocationActivity", "locationManager.requestLocationUpdates");
+        if (mLocationManager != null) {
+            Log.d("LocationActivity", "mLocationManager.requestLocationUpdates");
             // バックグラウンドから戻ってしまうと例外が発生する場合がある
             try {
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     return;
                 }
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, minDistance, this);
+                // 位置情報が取れるまで繰り返す
+                int count = 0;
+                while (mLocationManager.getLastKnownLocation(mProvider) == null && count < 3) {
+                    try {
+                        // 使用可能なプロバイダを取得
+                        List<String> providers = mLocationManager.getProviders(true);
+                        for (String provider : providers) {
+                            mLocationManager.requestLocationUpdates(provider, mMinTime, mMinDistance, this);
+                            if (mLocationManager.getLastKnownLocation(provider) != null) {
+                                break;
+                            }
+                        }
+                        Thread.sleep(3000); //3000ミリ秒Sleepする
+                        count++;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (mLocationManager.getLastKnownLocation(mProvider) == null) {
+                    mLocationManager.removeUpdates(this);
+                    Toast toast = Toast.makeText(this, "位置情報を取得できませんでした。", Toast.LENGTH_SHORT);
+                    toast.show();
+
+                    // MainActivityに戻す
+                    finish();
+                }
+
             } catch (Exception e) {
+                mLocationManager.removeUpdates(this);
                 e.printStackTrace();
 
                 Toast toast = Toast.makeText(this, "例外が発生、位置情報のPermissionを許可していますか？", Toast.LENGTH_SHORT);
                 toast.show();
 
-                //MainActivityに戻す
+                // MainActivityに戻す
                 finish();
             }
         } else {
+            mLocationManager.removeUpdates(this);
+            Toast toast = Toast.makeText(this, "位置情報を取得できませんでした。", Toast.LENGTH_SHORT);
+            toast.show();
+
+            // MainActivityに戻す
+            finish();
         }
-        super.onResume();
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        latitude = location.getLatitude();
-        longitude = location.getLongitude();
+        mLatitude = location.getLatitude();
+        mLongitude = location.getLongitude();
     }
 
     @Override
@@ -316,4 +356,5 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
     public void onProviderDisabled(String provider) {
 
     }
+
 }

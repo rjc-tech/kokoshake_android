@@ -304,6 +304,7 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
                         Thread.sleep(3000); //3000ミリ秒Sleepする
                         count++;
                     } catch (InterruptedException e) {
+                        mLocationManager.removeUpdates(this);
                         e.printStackTrace();
                     }
                 }

@@ -210,7 +210,9 @@ public class MyLocationUtil {
 
     void setLocation(final Location location) {
         stopLocationService();
-        mOnProcessCallbackListener.onSuccessLocation(location.getLatitude(), location.getLongitude());
+        if (mOnProcessCallbackListener != null) {
+            mOnProcessCallbackListener.onSuccessLocation(location.getLatitude(), location.getLongitude());
+        }
     }
 
     /**

@@ -42,6 +42,7 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
     private MyLocationUtil mLocationUtil;
     private MyLocationUtil.OnProcessCallbackListener mOnProcessCallbackListener;
     private String mCurrentAddress = null;
+    private boolean mIsAlreadyVibration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +117,7 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
             mManager.registerListener(this, s, SensorManager.SENSOR_DELAY_UI);
         }
         mLocationUtil.removeOnProcessCallbackListener();
+        mIsAlreadyVibration = false;
     }
 
     @Override
@@ -203,8 +205,11 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
         final String sendAddress = SharedPreferenceUtil.getSendAddress(getApplicationContext());
         if (!TextUtils.isEmpty(sendAddress)) {
 
-            mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-            mVibrator.vibrate(500);
+            if (!mIsAlreadyVibration) {
+                mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+                mVibrator.vibrate(500);
+                mIsAlreadyVibration = true;
+            }
 
             Intent intent = new Intent();
             intent.setAction(Intent.ACTION_SENDTO);

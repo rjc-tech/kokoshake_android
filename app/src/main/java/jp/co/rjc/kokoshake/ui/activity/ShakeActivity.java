@@ -17,6 +17,7 @@ import android.widget.RelativeLayout;
 import java.util.List;
 
 import jp.co.rjc.kokoshake.R;
+import jp.co.rjc.kokoshake.util.MyLocationUtil;
 import jp.co.rjc.kokoshake.util.SharedPreferenceUtil;
 
 /**
@@ -38,23 +39,29 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
     private SensorManager mManager;  //センサーマネージャーオブジェクト
     private RelativeLayout relativeLayout;  //リレーティブレイアウトオブジェクト
     private Vibrator mVibrator;  //バイブレーションオブジェクト
+    private MyLocationUtil mLocationUtil;
+    private MyLocationUtil.OnProcessCallbackListener mOnProcessCallbackListener;
+    private String mCurrentAddress = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shake);
 
+        mLocationUtil = MyLocationUtil.getsInstance(this);
+        mOnProcessCallbackListener = new MyLocationUtil.OnProcessCallbackListener() {
+            @Override
+            public void onSuccessLocation(double latitude, double longitude) {
+                mCurrentAddress = mLocationUtil.getAddress(latitude, longitude);
+            }
 
-//        // Fragmentを作成します
-//        TutorialFragment fragment = new TutorialFragment();
-//        // Fragmentの追加や削除といった変更を行う際は、Transactionを利用します
-//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//        // 新しく追加を行うのでaddを使用します
-//        // 他にも、メソッドにはreplace removeがあります
-//        // メソッドの1つ目の引数は対象のViewGroupのID、2つ目の引数は追加するfragment
-//        transaction.add(R.id.container, fragment);
-//        // 最後にcommitを使用することで変更を反映します
-//        transaction.commit();
+            @Override
+            public void onFailedLodation() {
+                // 位置情報取得できなくてもなにもしない
+            }
+        };
+        mLocationUtil.setOnProcessCallbackListener(mOnProcessCallbackListener);
+        mLocationUtil.startLocationService();
 
         //センサーサービスを利用する
         mManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -108,6 +115,7 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
             //リスナーの登録
             mManager.registerListener(this, s, SensorManager.SENSOR_DELAY_UI);
         }
+        mLocationUtil.removeOnProcessCallbackListener();
     }
 
     @Override
@@ -213,12 +221,14 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
             }
 
             // 本文
+            final StringBuilder builder = new StringBuilder();
             final String content = SharedPreferenceUtil.getMailContent(getApplicationContext());
-            if (TextUtils.isEmpty(content)) {
-                intent.putExtra(Intent.EXTRA_TEXT, "仮の本文です。");
-            } else {
-                intent.putExtra(Intent.EXTRA_TEXT, content);
+            builder.append(TextUtils.isEmpty(content) ? "仮の本文です。" : content);
+            if (!TextUtils.isEmpty(mCurrentAddress)) {
+                builder.append("\n\n");
+                builder.append(mCurrentAddress);
             }
+            intent.putExtra(Intent.EXTRA_TEXT, builder.toString());
             startActivity(Intent.createChooser(intent, null));
         }
 

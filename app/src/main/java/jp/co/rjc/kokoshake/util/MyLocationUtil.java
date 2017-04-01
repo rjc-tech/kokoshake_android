@@ -238,6 +238,10 @@ public class MyLocationUtil {
                 result.append(address.getAddressLine(i));
             }
         }
+        result.append("\n\nhttps://www.google.co.jp/maps/@");
+        result.append(String.valueOf(latitude));
+        result.append(",");
+        result.append(String.valueOf(longitude));
         return result.toString();
     }
 }

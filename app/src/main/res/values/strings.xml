@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">ココshake！</string>
+    <string name="about_application">このアプリについて</string>
+    <string name="label_licenses">OSSライセンス</string>
+
+    <string name="select_address">メールアドレス選択</string>
+
+    <string name="tutorial_text">ココshake!は端末を振ることで、あらかじめインストールされたメールアプリに、位置情報を連携することができるアプリです。</string>
+    <string name="remind_registration_text">まずは右上の設定ボタンから初回登録を行ってください。</string>
+
+    <string name="send_address">送信先アドレス</string>
+    <string name="tap_to_contact">タップして連絡先を選択</string>
+    <string name="mail_subject">件名</string>
+    <string name="input_subject">件名を入力</string>
+    <string name="mail_content">本文</string>
+    <string name="input_content">本文を入力</string>
+
+    <string name="registration">登録</string>
+    <string name="cancel">キャンセル</string>
+
+    <string name="message_registration_complete">送信先情報の登録が完了しました</string>
+    <string name="message_hint_send_mail">※メール送信の際は、登録した本文の前に現在地情報が表示されます。</string>
+    <string name="message_err_no_mail_address">選択した連絡先にはメールアドレスがありません。</string>
+    <string name="message_err_open_contact">電話帳情報が取得できませんでした。</string>
+
+    <string name="message_err_required">%sが未入力です</string>
+</resources>
